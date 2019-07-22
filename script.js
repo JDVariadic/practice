@@ -9,5 +9,5 @@ function exponent(x,y) {
        output = output * x
   }
   return output;
-
+  
 }
