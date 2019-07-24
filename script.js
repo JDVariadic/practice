@@ -15,8 +15,8 @@
 
 var testObject = {
 
-    "data" : {
-      "009202717" : {
+    data : {
+      "009202717009202717009202717" : {
          1563783497433 : {
             "positive" : 1
           },
@@ -30,11 +30,11 @@ var testObject = {
 
 /*
 "dataOutput" : {
-  (UTC for the day July 20 for example) : {
+  Timestamp : {
     "positive" : {
       "009202717": 1
     },
-   (UTC for the day July 21) : {
+  Timestamp2 : {
     "neutral" : {
       "009202717": 2
     }
@@ -44,7 +44,7 @@ function processObject(object) {
   const {data: inputData} = object
   let pagesToTimestamp = {}
   let dateToSentiments= {}
-
+  let dataOutput = {}
   
   // pagesToTimestamp {
   //   timestamp: {
@@ -55,22 +55,47 @@ function processObject(object) {
 
   //   }
   // }
-  
+
+  // dataToSentiments: {
+  //   timestamp : {
+  //     positive: {
+  //       pageID: value,
+  //       pageID2: value3
+  //     },
+  //     negative: {
+  //       pageID: value2
+  //     }
+  //   }
+  // }
   for (const i in inputData){
     let pageID = i
     let pageIdContents = inputData[i]
-    for(const time in pageIdContents) {
-      console.log(time, pageIdContents)
-      if(!pagesToTimestamp[`${time}`]){
-        pagesToTimestamp[`${time}`] = {}
-      } 
-        pagesToTimestamp[`${time}`][`${pageID}`] = true
 
-      
+    for(const time in pageIdContents) {
+      // console.log(time, pageIdContents)
+
+      // if(!pagesToTimestamp[`${time}`]){
+      //   pagesToTimestamp[`${time}`] = {}
+      // } 
+
+      // pagesToTimestamp[`${time}`][`${pageID}`] = true
+      const pageTimeContent = pageIdContents[time];
+      for(const sentiment in pageTimeContent) {
+        console.log(time, sentiment, pageTimeContent[`${sentiment}`])
+
+        if(!dataOutput[`${time}`]) {
+          dataOutput[`${time}`] = {}
+        }
+        
+        dataOutput[`${time}`][`${sentiment}`] = {
+          [`${pageID}`] : pageIdContents[`${time}`][`${sentiment}`]
+        }
+      }
     }
+    
   }
 
-  console.log(pagesToTimestamp)
+  console.log(dataOutput)
     /*
     let utcDate = inputData[i]
     let sentimentKeyObject = Object.values(pageIDContents)
