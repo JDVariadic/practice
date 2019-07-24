@@ -14,6 +14,7 @@
  */
 
 var testObject = {
+
     "data" : {
       "009202717" : {
          1563783497433 : {
@@ -40,26 +41,68 @@ var testObject = {
 */
 function processObject(object) {
   let dataArray = []
-  var objectLength = Object.values(object.data)[0][0]
-  //So far only prints one set of data, fix for-loop
-  for(var i = 0; i < 1; i++){
-    console.log("Iteration" + Object.keys(object).length)
-    let pageID = Object.keys(object.data)[0]
-    let pageIDContents = Object.values(object["data"])[i]
-    let utcDate = Object.keys(pageIDContents)[1]
-    let sentimentKey = Object.values(pageIDContents)
-    let currentSentimentKey = JSON.stringify(Object.keys(sentimentKey[0]))
-    let currentSentimentValue = JSON.stringify(Object.values(sentimentKey[0]))
+  const {data: inputData} = object
+  let pagesToTimestamp = {}
+  let dateToSentiments= {}
+
+  
+  // pagesToTimestamp {
+  //   timestamp: {
+  //     pageID: true,
+  //     pageID2: true
+  //   },
+  //   timestamp2: {
+
+  //   }
+  // }
+  
+  for (const i in inputData){
+    let pageID = i
+    let pageIdContents = inputData[i]
+    for(const time in pageIdContents) {
+      console.log(time, pageIdContents)
+      if(!pagesToTimestamp[`${time}`]){
+        pagesToTimestamp[`${time}`] = {}
+      } 
+        pagesToTimestamp[`${time}`][`${pageID}`] = true
+
+      
+    }
+  }
+
+  console.log(pagesToTimestamp)
+    /*
+    let utcDate = inputData[i]
+    let sentimentKeyObject = Object.values(pageIDContents)
+
 
     console.log("pageID value: " + pageID)
-    console.log("pageIDContents value: " + pageIDContents)
+    console.log("pageIDContents value array " + JSON.stringify(pageIDContents))
     console.log("utcDate value: " + utcDate)
+    console.log("sentimentKeyObject value: " + JSON.stringify(sentimentKeyObject))
+    console.log("sentimentKeyObject specific data: " + JSON.stringify(Object.keys(Object.values(sentimentKeyObject)[1])))
 
     let dataInstance = {}
+
+
     dataInstance[utcDate] = {
-      [currentSentimentKey.substring(1, currentSentimentKey.length-1)]: {[pageID]: currentSentimentValue.substring(1, currentSentimentValue.length-1)}
+      //[formattedsentimentKeyObject]: {[pageID]: formattedSentimentValue}
     }
+
+    for(let j = 0; j < sentimentKeyObject.length; j++) {
+      let currentsentimentKeyObject = JSON.stringify(Object.keys(Object.values(sentimentKeyObject)[j]))
+      let currentSentimentValue = JSON.stringify(Object.values(sentimentKeyObject[j]))
+      console.log("currentSentimentValue: " + currentSentimentValue)
+      let formattedsentimentKeyObject = currentsentimentKeyObject.substring(1, currentsentimentKeyObject.length-1)
+      let formattedSentimentValue = currentSentimentValue.substring(1, currentSentimentValue.length-1)
+      //New sentimentkeys overriding old ones
+      dataInstance[utcDate] = {[formattedsentimentKeyObject]: [formattedSentimentValue]}
+    }
+
     dataArray.push(dataInstance)
-  }
+    */
+  
   return dataArray
 }
+
+processObject(testObject)
