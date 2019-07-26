@@ -1,133 +1,97 @@
+const phrase = 'good boy roger'
+const sentence = 'the good person roger that picked the litter is that boy named roger! roger is really cool'
 
-/*
-"data" : {
-  "009202717" : {
-     1563783497433 : {
-        "positive" : 1
-      },
-     1563983500237: {
-        "neutral" : 2,
-        "negative" : 5
-      }
-   }
- }
- */
+function searchForPhrase (inputPhrase, inputSentence) {
+  // Split inputs into arrays
+  const arrayOfPhrase = inputPhrase.split(' ')
+  let arrayOfSentence = inputSentence.split(' ')
 
-var testObject = {
+  const distanceFromBeginningOfSentence = []
+  const distanceBetweenWords = []
+  const listOfWordsBeingEnclosed = []
 
-    data : {
-      "009202717009202717009202717" : {
-         1563783497433 : {
-            "positive" : 1
-          },
-         1563983500237: {
-            "neutral" : 2,
-            "negative" : 5
-          }
-     }
-   }
-}
-
-/*
-"dataOutput" : {
-  Timestamp : {
-    "positive" : {
-      "009202717": 1
-    },
-  Timestamp2 : {
-    "neutral" : {
-      "009202717": 2
-    }
-*/
-function processObject(object) {
-  let dataArray = []
-  const {data: inputData} = object
-  let pagesToTimestamp = {}
-  let dateToSentiments= {}
-  let dataOutput = {}
-  
-  // pagesToTimestamp {
-  //   timestamp: {
-  //     pageID: true,
-  //     pageID2: true
-  //   },
-  //   timestamp2: {
-
-  //   }
-  // }
-
-  // dataToSentiments: {
-  //   timestamp : {
-  //     positive: {
-  //       pageID: value,
-  //       pageID2: value3
-  //     },
-  //     negative: {
-  //       pageID: value2
-  //     }
-  //   }
-  // }
-  for (const i in inputData){
-    let pageID = i
-    let pageIdContents = inputData[i]
-
-    for(const time in pageIdContents) {
-      // console.log(time, pageIdContents)
-
-      // if(!pagesToTimestamp[`${time}`]){
-      //   pagesToTimestamp[`${time}`] = {}
-      // } 
-
-      // pagesToTimestamp[`${time}`][`${pageID}`] = true
-      const pageTimeContent = pageIdContents[time];
-      for(const sentiment in pageTimeContent) {
-        console.log(time, sentiment, pageTimeContent[`${sentiment}`])
-
-        if(!dataOutput[`${time}`]) {
-          dataOutput[`${time}`] = {}
-        }
-        
-        dataOutput[`${time}`][`${sentiment}`] = {
-          [`${pageID}`] : pageIdContents[`${time}`][`${sentiment}`]
-        }
+  for (const replacementWord in arrayOfPhrase) {
+    // Add a loop that iterates over arrayOfSentence
+    for (const wordInSentence in arrayOfSentence) {
+      const wordBeingCompared = arrayOfSentence[wordInSentence].replace(/[^\w\s]|_/g, '')
+      if (wordBeingCompared === arrayOfPhrase[replacementWord]) {
+        distanceFromBeginningOfSentence.push(parseInt(wordInSentence, 10))
       }
     }
-    
   }
 
-  console.log(dataOutput)
-    /*
-    let utcDate = inputData[i]
-    let sentimentKeyObject = Object.values(pageIDContents)
+  for (let i = 0; i < distanceFromBeginningOfSentence.length - 1; i++) {
+    distanceBetweenWords.push(Math.abs(distanceFromBeginningOfSentence[i + 1] - distanceFromBeginningOfSentence[i]))
+  }
 
+  const distanceBetweenWordsCopy = distanceBetweenWords.slice(0)
+  console.log('distanceBetweenWordsCopy ', distanceBetweenWordsCopy)
 
-    console.log("pageID value: " + pageID)
-    console.log("pageIDContents value array " + JSON.stringify(pageIDContents))
-    console.log("utcDate value: " + utcDate)
-    console.log("sentimentKeyObject value: " + JSON.stringify(sentimentKeyObject))
-    console.log("sentimentKeyObject specific data: " + JSON.stringify(Object.keys(Object.values(sentimentKeyObject)[1])))
+  for (let i = distanceBetweenWordsCopy.length - 1; i > 0; i--) {
+    const shortestDistance = Math.min.apply(null, distanceBetweenWordsCopy)
 
-    let dataInstance = {}
+    let firstGlobalIndex = distanceBetweenWordsCopy.indexOf(shortestDistance)
+    firstGlobalIndex = distanceFromBeginningOfSentence[firstGlobalIndex]
+    const firstWord = arrayOfSentence[firstGlobalIndex].replace(/[^\w\s]|_/g, '')
 
-
-    dataInstance[utcDate] = {
-      //[formattedsentimentKeyObject]: {[pageID]: formattedSentimentValue}
+    let secondGlobalIndex = distanceBetweenWordsCopy.indexOf(shortestDistance) + 1
+    secondGlobalIndex = distanceFromBeginningOfSentence[secondGlobalIndex]
+    const secondWord = arrayOfSentence[secondGlobalIndex].replace(/[^\w\s]|_/g, '')
+    // .replace(/[^\w\s]|_/g, '')
+    if (secondWord.replace(/[^\w\s]|_/g, '') !== firstWord.replace(/[^\w\s]|_/g, '')) {
+      listOfWordsBeingEnclosed.push(firstWord)
+      listOfWordsBeingEnclosed.push(firstGlobalIndex)
+      listOfWordsBeingEnclosed.push(secondWord)
+      listOfWordsBeingEnclosed.push(secondGlobalIndex)
+      break
+    } else {
+      distanceBetweenWordsCopy.splice(distanceBetweenWordsCopy.indexOf(shortestDistance), 1)
     }
+  }
 
-    for(let j = 0; j < sentimentKeyObject.length; j++) {
-      let currentsentimentKeyObject = JSON.stringify(Object.keys(Object.values(sentimentKeyObject)[j]))
-      let currentSentimentValue = JSON.stringify(Object.values(sentimentKeyObject[j]))
-      console.log("currentSentimentValue: " + currentSentimentValue)
-      let formattedsentimentKeyObject = currentsentimentKeyObject.substring(1, currentsentimentKeyObject.length-1)
-      let formattedSentimentValue = currentSentimentValue.substring(1, currentSentimentValue.length-1)
-      //New sentimentkeys overriding old ones
-      dataInstance[utcDate] = {[formattedsentimentKeyObject]: [formattedSentimentValue]}
+  let lastWord = arrayOfPhrase.filter(function (el) {
+    return listOfWordsBeingEnclosed.indexOf(el, '') < 0
+  })
+
+  lastWord = lastWord[0]
+  const distancesOfLastWord = []
+
+  for (const word in arrayOfSentence) {
+    if (arrayOfSentence[word] === lastWord) {
+      distancesOfLastWord.push(arrayOfSentence.indexOf(arrayOfSentence[word]))
     }
+  }
 
-    dataArray.push(dataInstance)
-    */
-  
-  return dataArray
+  // let referenceToLastWord
+  // if (listOfWordsBeingEnclosed[1] < listOfWordsBeingEnclosed[3]) {
+  //   referenceToLastWord = listOfWordsBeingEnclosed[0]
+  // } else {
+  //   referenceToLastWord = listOfWordsBeingEnclosed[2]
+  // }
+
+  // Iterate over lastWord candidates and initialize an array with their corresponding distances
+
+  // for (const value in distancesOfLastWord) {
+  //   distancesOfLastWord[value] = Math.abs(distancesOfLastWord[value] - listOfWordsBeingEnclosed[listOfWordsBeingEnclosed.indexOf(referenceToLastWord) + 1])
+  // }
+
+  let lastWordIndex = Math.min.apply(null, distancesOfLastWord)
+  listOfWordsBeingEnclosed.push(lastWord)
+  listOfWordsBeingEnclosed.push(lastWordIndex)
+
+  for (let j = 1; j < listOfWordsBeingEnclosed.length; j = j + 2) {
+    arrayOfSentence[listOfWordsBeingEnclosed[j]] = '<p>' + arrayOfSentence[listOfWordsBeingEnclosed[j]] + '</p>'
+  }
+
+  arrayOfSentence = arrayOfSentence.join(' ')
+  console.log('actual array: ', arrayOfSentence)
+  console.log(distanceFromBeginningOfSentence, ' distanceFromBeginningOfSentence')
+  console.log(distanceBetweenWords, ' distanceBetweenWords')
+  console.log(distanceBetweenWordsCopy, 'distanceBetweenWordsCopy')
+  console.log('words to be used: ', listOfWordsBeingEnclosed)
+  console.log('last word', lastWord)
+  console.log('distancesOfLastWord: ', distancesOfLastWord)
+  console.log('lastWordIndex: ', lastWordIndex)
 }
 
-processObject(testObject)
+searchForPhrase(phrase, sentence)
