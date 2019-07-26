@@ -1,5 +1,5 @@
 const phrase = 'good boy roger'
-const sentence = 'the good person roger that picked the litter is that boy named roger! roger is really cool'
+const sentence = 'the good person that picked the litter is that boy named roger! roger is really cool'
 
 function searchForPhrase (inputPhrase, inputSentence) {
   // Split inputs into arrays
@@ -54,14 +54,15 @@ function searchForPhrase (inputPhrase, inputSentence) {
   })
 
   lastWord = lastWord[0]
-  const distancesOfLastWord = []
+  const lastWordGlobalDistancesInSentence = []
 
   for (const word in arrayOfSentence) {
     if (arrayOfSentence[word] === lastWord) {
-      distancesOfLastWord.push(arrayOfSentence.indexOf(arrayOfSentence[word]))
+      lastWordGlobalDistancesInSentence.push(arrayOfSentence.indexOf(arrayOfSentence[word]))
     }
   }
 
+  // Checking for direction at which the last word would be selected
   // let referenceToLastWord
   // if (listOfWordsBeingEnclosed[1] < listOfWordsBeingEnclosed[3]) {
   //   referenceToLastWord = listOfWordsBeingEnclosed[0]
@@ -70,12 +71,12 @@ function searchForPhrase (inputPhrase, inputSentence) {
   // }
 
   // Iterate over lastWord candidates and initialize an array with their corresponding distances
-
-  // for (const value in distancesOfLastWord) {
-  //   distancesOfLastWord[value] = Math.abs(distancesOfLastWord[value] - listOfWordsBeingEnclosed[listOfWordsBeingEnclosed.indexOf(referenceToLastWord) + 1])
+  const lastWordRelativeDistances = []
+  // for (const value in lastWordGlobalDistancesInSentence) {
+  //   lastWordGlobalDistancesInSentence[value] = Math.abs(lastWordGlobalDistancesInSentence[value] - listOfWordsBeingEnclosed[listOfWordsBeingEnclosed.indexOf(referenceToLastWord) + 1])
   // }
 
-  let lastWordIndex = Math.min.apply(null, distancesOfLastWord)
+  let lastWordIndex = Math.min.apply(null, lastWordGlobalDistancesInSentence)
   listOfWordsBeingEnclosed.push(lastWord)
   listOfWordsBeingEnclosed.push(lastWordIndex)
 
@@ -89,9 +90,18 @@ function searchForPhrase (inputPhrase, inputSentence) {
   console.log(distanceBetweenWords, ' distanceBetweenWords')
   console.log(distanceBetweenWordsCopy, 'distanceBetweenWordsCopy')
   console.log('words to be used: ', listOfWordsBeingEnclosed)
-  console.log('last word', lastWord)
-  console.log('distancesOfLastWord: ', distancesOfLastWord)
-  console.log('lastWordIndex: ', lastWordIndex)
+  // console.log('last word: ', lastWord)
+  // console.log('lastWordGlobalDistancesInSentence: ', lastWordGlobalDistancesInSentence)
+  // console.log('lastWordIndex: ', lastWordIndex)
 }
 
 searchForPhrase(phrase, sentence)
+
+// Stuff to do
+// Keep track of the order of the arrayOfPhrase.
+// As of now, the program does not check the order of the phrases.
+
+// Fix the program for a two word phrase
+// Fix issue where array doesnt compute for lastWord distance properly AND select the last word with the LEAST distance
+
+// Fix issue where the function does not take into account the order of the phrase (it treats the phrase like three separate words)
