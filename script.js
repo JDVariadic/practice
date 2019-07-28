@@ -1,4 +1,4 @@
-const phrase = 'good boy roger'
+const phrase = 'roger good boy'
 const sentence = 'the roger person that good good picked the litter is that boy named roger!'
 
 function searchForPhrase (inputPhrase, inputSentence) {
@@ -68,11 +68,13 @@ function searchForPhrase (inputPhrase, inputSentence) {
 
   // Similar to what was done earlier, find the relative distances but this time for the lastWord only
   for (const word in arrayOfSentence) {
-    if (arrayOfSentence[word] === lastWord) {
+    if (arrayOfSentence[word].replace(/[^\w\s]|_/g, '') === lastWord.replace(/[^\w\s]|_/g, '')) {
       lastWordGlobalDistancesInSentence.push(parseInt(word))
     }
   }
 
+  let lastWordIndexInPhrase = arrayOfPhrase.indexOf(lastWord)
+  console.log('lastWordIndexInPhrase: ', lastWordIndexInPhrase)
   let lastWordRelativeDistance
   let leastDistance
   let leastRelativeDistance
@@ -80,20 +82,23 @@ function searchForPhrase (inputPhrase, inputSentence) {
   for (const lastWordItem in lastWordGlobalDistancesInSentence) {
     // To check which of the two words are closer to the last one.
     // The closer one would be used as a reference to find the shortest distance
-
     // FIX: Check if the last word follows the order of the phrase in the input
-    if (Math.abs(lastWordItem - listOfWordsBeingEnclosed[1]) < Math.abs(lastWordItem - listOfWordsBeingEnclosed[3])) {
-      let referenceToLastWord = listOfWordsBeingEnclosed[0]
-      lastWordRelativeDistance = Math.abs(lastWordItem - listOfWordsBeingEnclosed[1])
-    } else {
-      let referenceToLastWord = listOfWordsBeingEnclosed[2]
-      lastWordRelativeDistance = Math.abs(lastWordItem - listOfWordsBeingEnclosed[3])
-    }
-    // Iterate over lastWord candidates and initialize an array with their corresponding distances
-    // let lastWordIndex = Math.min.apply(null, lastWordGlobalDistancesInSentence)
-    if (lastWordRelativeDistance < leastRelativeDistance || leastRelativeDistance === undefined || leastRelativeDistance == null) {
-      leastRelativeDistance = lastWordRelativeDistance
-      leastDistance = lastWordGlobalDistancesInSentence[lastWordItem]
+    // FIX: issue where program doesnt work if the lastWord is found out to be the first word in the sentence
+    console.log(arrayOfPhrase.indexOf(listOfWordsBeingEnclosed[2]))
+    if ((lastWordIndexInPhrase > arrayOfPhrase.indexOf(listOfWordsBeingEnclosed[2]) && lastWordGlobalDistancesInSentence[lastWordItem] > arrayOfPhrase.indexOf(listOfWordsBeingEnclosed[2]))) {
+      if (Math.abs(lastWordItem - listOfWordsBeingEnclosed[1]) < Math.abs(lastWordItem - listOfWordsBeingEnclosed[3])) {
+        let referenceToLastWord = listOfWordsBeingEnclosed[0]
+        lastWordRelativeDistance = Math.abs(lastWordItem - listOfWordsBeingEnclosed[1])
+      } else {
+        let referenceToLastWord = listOfWordsBeingEnclosed[2]
+        lastWordRelativeDistance = Math.abs(lastWordItem - listOfWordsBeingEnclosed[3])
+      }
+      // Iterate over lastWord candidates and initialize an array with their corresponding distances
+      // let lastWordIndex = Math.min.apply(null, lastWordGlobalDistancesInSentence)
+      if (lastWordRelativeDistance < leastRelativeDistance || leastRelativeDistance === undefined || leastRelativeDistance == null) {
+        leastRelativeDistance = lastWordRelativeDistance
+        leastDistance = lastWordGlobalDistancesInSentence[lastWordItem]
+      }
     }
   }
 
@@ -111,12 +116,13 @@ function searchForPhrase (inputPhrase, inputSentence) {
 
   console.log(distanceFromBeginningOfSentence, ' distanceFromBeginningOfSentence')
   console.log(distanceBetweenWords, ' distanceBetweenWords')
-  console.log('words to be used: ', listOfWordsBeingEnclosed)
+  console.log('listOfWordsBeingEnclosed: ', listOfWordsBeingEnclosed)
+  console.log('phrase: ', phrase)
+  console.log('sentence: ', sentence)
+  console.log('lastWordGlobalDistancesInSentence: ', lastWordGlobalDistancesInSentence)
   return arrayOfSentence
 }
 
-console.log('phrase: ', phrase)
-console.log('sentence: ', sentence)
 console.log(searchForPhrase(phrase, sentence))
 
 // Stuff to do
