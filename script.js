@@ -1,5 +1,5 @@
 const phrase = 'good boy roger'
-const sentence = 'the good person that picked the litter is that boy named roger! roger is really cool'
+const sentence = 'the roger person that good good picked the litter is that boy named roger!'
 
 function searchForPhrase (inputPhrase, inputSentence) {
   // Split inputs into arrays
@@ -10,9 +10,9 @@ function searchForPhrase (inputPhrase, inputSentence) {
   const distanceBetweenWords = []
   const listOfWordsBeingEnclosed = []
 
-  for (const replacementWord in arrayOfPhrase) {
-    // Add a loop that iterates over arrayOfSentence
-    for (const wordInSentence in arrayOfSentence) {
+  // Add a loop that iterates over arrayOfSentence
+  for (const wordInSentence in arrayOfSentence) {
+    for (const replacementWord in arrayOfPhrase) {
       const wordBeingCompared = arrayOfSentence[wordInSentence].replace(/[^\w\s]|_/g, '')
       if (wordBeingCompared === arrayOfPhrase[replacementWord]) {
         distanceFromBeginningOfSentence.push(parseInt(wordInSentence, 10))
@@ -20,25 +20,34 @@ function searchForPhrase (inputPhrase, inputSentence) {
     }
   }
 
+  // Find Relative Distances of each word in the phrase
   for (let i = 0; i < distanceFromBeginningOfSentence.length - 1; i++) {
     distanceBetweenWords.push(Math.abs(distanceFromBeginningOfSentence[i + 1] - distanceFromBeginningOfSentence[i]))
   }
 
+  // Copy the relative distance array to use it as reference in the for loop
   const distanceBetweenWordsCopy = distanceBetweenWords.slice(0)
-  console.log('distanceBetweenWordsCopy ', distanceBetweenWordsCopy)
 
+  // Iterating in reverse as elements would be removed from the copy
+  // Checks for the shortest distance between two words
+  // Also checks if these words are not the same, or else get the next shortest distance and check for the same conditions
   for (let i = distanceBetweenWordsCopy.length - 1; i > 0; i--) {
     const shortestDistance = Math.min.apply(null, distanceBetweenWordsCopy)
 
     let firstGlobalIndex = distanceBetweenWordsCopy.indexOf(shortestDistance)
     firstGlobalIndex = distanceFromBeginningOfSentence[firstGlobalIndex]
-    const firstWord = arrayOfSentence[firstGlobalIndex].replace(/[^\w\s]|_/g, '')
+    let firstWord = arrayOfSentence[firstGlobalIndex].replace(/[^\w\s]|_/g, '')
 
     let secondGlobalIndex = distanceBetweenWordsCopy.indexOf(shortestDistance) + 1
     secondGlobalIndex = distanceFromBeginningOfSentence[secondGlobalIndex]
-    const secondWord = arrayOfSentence[secondGlobalIndex].replace(/[^\w\s]|_/g, '')
-    // .replace(/[^\w\s]|_/g, '')
-    if (secondWord.replace(/[^\w\s]|_/g, '') !== firstWord.replace(/[^\w\s]|_/g, '')) {
+    let secondWord = arrayOfSentence[secondGlobalIndex].replace(/[^\w\s]|_/g, '')
+
+    if (secondWord !== firstWord) {
+      if (arrayOfPhrase.indexOf(secondWord) < arrayOfPhrase.indexOf(firstWord)) {
+        // Interchange the values of both variables
+        secondGlobalIndex = [firstGlobalIndex, firstGlobalIndex = secondGlobalIndex][0]
+        secondWord = [firstWord, firstWord = secondWord][0]
+      }
       listOfWordsBeingEnclosed.push(firstWord)
       listOfWordsBeingEnclosed.push(firstGlobalIndex)
       listOfWordsBeingEnclosed.push(secondWord)
@@ -49,6 +58,7 @@ function searchForPhrase (inputPhrase, inputSentence) {
     }
   }
 
+  // Given a three-letter phrase, search for the last word that is not firstWord and secondWord
   let lastWord = arrayOfPhrase.filter(function (el) {
     return listOfWordsBeingEnclosed.indexOf(el, '') < 0
   })
@@ -56,46 +66,58 @@ function searchForPhrase (inputPhrase, inputSentence) {
   lastWord = lastWord[0]
   const lastWordGlobalDistancesInSentence = []
 
+  // Similar to what was done earlier, find the relative distances but this time for the lastWord only
   for (const word in arrayOfSentence) {
     if (arrayOfSentence[word] === lastWord) {
-      lastWordGlobalDistancesInSentence.push(arrayOfSentence.indexOf(arrayOfSentence[word]))
+      lastWordGlobalDistancesInSentence.push(parseInt(word))
     }
   }
 
-  // Checking for direction at which the last word would be selected
-  // let referenceToLastWord
-  // if (listOfWordsBeingEnclosed[1] < listOfWordsBeingEnclosed[3]) {
-  //   referenceToLastWord = listOfWordsBeingEnclosed[0]
-  // } else {
-  //   referenceToLastWord = listOfWordsBeingEnclosed[2]
-  // }
+  let lastWordRelativeDistance
+  let leastDistance
+  let leastRelativeDistance
 
-  // Iterate over lastWord candidates and initialize an array with their corresponding distances
-  const lastWordRelativeDistances = []
-  // for (const value in lastWordGlobalDistancesInSentence) {
-  //   lastWordGlobalDistancesInSentence[value] = Math.abs(lastWordGlobalDistancesInSentence[value] - listOfWordsBeingEnclosed[listOfWordsBeingEnclosed.indexOf(referenceToLastWord) + 1])
-  // }
+  for (const lastWordItem in lastWordGlobalDistancesInSentence) {
+    // To check which of the two words are closer to the last one.
+    // The closer one would be used as a reference to find the shortest distance
 
-  let lastWordIndex = Math.min.apply(null, lastWordGlobalDistancesInSentence)
+    // FIX: Check if the last word follows the order of the phrase in the input
+    if (Math.abs(lastWordItem - listOfWordsBeingEnclosed[1]) < Math.abs(lastWordItem - listOfWordsBeingEnclosed[3])) {
+      let referenceToLastWord = listOfWordsBeingEnclosed[0]
+      lastWordRelativeDistance = Math.abs(lastWordItem - listOfWordsBeingEnclosed[1])
+    } else {
+      let referenceToLastWord = listOfWordsBeingEnclosed[2]
+      lastWordRelativeDistance = Math.abs(lastWordItem - listOfWordsBeingEnclosed[3])
+    }
+    // Iterate over lastWord candidates and initialize an array with their corresponding distances
+    // let lastWordIndex = Math.min.apply(null, lastWordGlobalDistancesInSentence)
+    if (lastWordRelativeDistance < leastRelativeDistance || leastRelativeDistance === undefined || leastRelativeDistance == null) {
+      leastRelativeDistance = lastWordRelativeDistance
+      leastDistance = lastWordGlobalDistancesInSentence[lastWordItem]
+    }
+  }
+
   listOfWordsBeingEnclosed.push(lastWord)
-  listOfWordsBeingEnclosed.push(lastWordIndex)
+  listOfWordsBeingEnclosed.push(leastDistance)
+
+  // Getting the corresponding index of the words and enclosing those said words in the <p> tag
 
   for (let j = 1; j < listOfWordsBeingEnclosed.length; j = j + 2) {
     arrayOfSentence[listOfWordsBeingEnclosed[j]] = '<p>' + arrayOfSentence[listOfWordsBeingEnclosed[j]] + '</p>'
   }
 
+  // Just for printing information
   arrayOfSentence = arrayOfSentence.join(' ')
-  console.log('actual array: ', arrayOfSentence)
+
   console.log(distanceFromBeginningOfSentence, ' distanceFromBeginningOfSentence')
   console.log(distanceBetweenWords, ' distanceBetweenWords')
-  console.log(distanceBetweenWordsCopy, 'distanceBetweenWordsCopy')
   console.log('words to be used: ', listOfWordsBeingEnclosed)
-  // console.log('last word: ', lastWord)
-  // console.log('lastWordGlobalDistancesInSentence: ', lastWordGlobalDistancesInSentence)
-  // console.log('lastWordIndex: ', lastWordIndex)
+  return arrayOfSentence
 }
 
-searchForPhrase(phrase, sentence)
+console.log('phrase: ', phrase)
+console.log('sentence: ', sentence)
+console.log(searchForPhrase(phrase, sentence))
 
 // Stuff to do
 // Keep track of the order of the arrayOfPhrase.
