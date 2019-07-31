@@ -1,16 +1,11 @@
-const phrase = 'good boy'
-let sentence = 'All the good neighbors have brought their boy to teach them to ride a bike at the park today. They keep tumbling around but they are okay. But The good boy that picked good boy roger the litter is the one named Roger! Roger may not be good at riding the bike, but he has good manners.'
+const phrase = 'boy good roger'
+let sentence = 'All the good neighbors have brought their boy to teach them to ride a bike at the park today. They keep tumbling around but they are okay. But The good boy that picked the litter is the one named Roger! Roger may not be good at riding the bike, but he has good manners.'
 sentence = sentence.toLowerCase()
 
 function searchForPhrase (inputPhrase, inputSentence) {
   const arrayOfPhrase = inputPhrase.split(' ')
   let arrayOfSentence = inputSentence.split(' ')
   const toBeHighlighted = []
-  // Where:
-  // arrayOfPhrase[0] is wordA
-  // arrayOfPhrase[1] is wordB
-  // arrayOfPhrase[2] is wordC
-
   let wordA
   let backupA
   let wordB
@@ -21,9 +16,9 @@ function searchForPhrase (inputPhrase, inputSentence) {
 
   if (arrayOfPhrase.length === 3) {
     for (const wordInSentenceIndex in arrayOfSentence) {
-
+      // If the two or three word phrase is 'good good' or 'good good good', the program doesnt work properly
       if (arrayOfSentence[wordInSentenceIndex].replace(/[^\w\s]|_/g, '') === arrayOfPhrase[0]) {
-        // check whether or not wordA exists and act accordingly
+
         if (typeof (wordA) === 'undefined') {
           wordA = wordInSentenceIndex
         } else if (typeof (wordA) !== 'undefined') {
@@ -40,7 +35,8 @@ function searchForPhrase (inputPhrase, inputSentence) {
         // Instances when backupB traverses but is not assigned to wordB
         // Instances when both backupB and wordB change (through calculating distances)
         if (typeof (wordA) !== 'undefined') {
-          if (typeof (wordB) === 'undefined' || (backupB - backupA > 0 && wordB - wordA > backupB - backupA)) {
+          if (typeof (wordB) === 'undefined' || (backupB - backupA > 0 && wordB - wordA > backupB - backupA && backupB < wordC)) {
+            // Problem somewhere here for test-case 'boy good roger'
             wordB = wordInSentenceIndex
             backupB = wordB
           } else if (typeof (wordB) !== 'undefined') {
@@ -86,11 +82,6 @@ function searchForPhrase (inputPhrase, inputSentence) {
           wordA = backupA
           wordB = wordInSentenceIndex
         }
-
-        // For 3-word
-        // if (Math.abs(wordB - wordA) < Math.abs(wordB - backupA)) {
-        //   backupA = wordA
-        // }
       }
     }
   } else {
@@ -103,9 +94,11 @@ function searchForPhrase (inputPhrase, inputSentence) {
     toBeHighlighted.push(wordC)
   }
   console.log(toBeHighlighted)
-  for (const index in toBeHighlighted) {
-    console.log(toBeHighlighted[index])
-    arrayOfSentence[toBeHighlighted[index]] = '<p>' + arrayOfSentence[toBeHighlighted[index]] + '<p>'
+  if (toBeHighlighted.length === arrayOfPhrase.length) {
+    for (const index in toBeHighlighted) {
+      console.log(toBeHighlighted[index])
+      arrayOfSentence[toBeHighlighted[index]] = '<p>' + arrayOfSentence[toBeHighlighted[index]] + '<p>'
+    }
   }
 
   arrayOfSentence = arrayOfSentence.join(' ')
