@@ -1,5 +1,5 @@
-const phrase = 'boy good roger'
-let sentence = 'All the good neighbors have brought their boy to teach them to ride a bike at the park today. They keep tumbling around but they are okay. But The good boy that picked the litter is the one named Roger! Roger may not be good at riding the bike, but he has good manners.'
+const phrase = 'good boy roger'
+let sentence = 'All the good roger good neighbors good have brought their roger good good boy to teach them to ride a bike at the park today. They keep tumbling around but they are okay. But The good boy that picked the litter is the one named Roger! Roger may not be good at riding the bike, but he has good manners.'
 sentence = sentence.toLowerCase()
 
 function searchForPhrase (inputPhrase, inputSentence) {
@@ -15,6 +15,24 @@ function searchForPhrase (inputPhrase, inputSentence) {
   let wordC
 
   if (arrayOfPhrase.length === 3) {
+    if (arrayOfPhrase[0] === arrayOfPhrase[1] && arrayOfPhrase[0] === arrayOfPhrase[2]) {
+      for (const wordInSentenceIndex in arrayOfSentence) {
+        if (arrayOfSentence[wordInSentenceIndex].replace(/[^\w\s]|_/g, '') === arrayOfPhrase[0]) {
+          if (typeof wordA === 'undefined') {
+            wordA = wordInSentenceIndex
+          } else if (typeof wordB === 'undefined') {
+            wordB = wordInSentenceIndex
+          } else if (typeof wordC === 'undefined') {
+            wordC = wordInSentenceIndex
+          }
+
+          if (typeof wordA !== 'undefined') {
+            backupA = wordInSentenceIndex
+          }
+        }
+      }
+    }
+
     for (const wordInSentenceIndex in arrayOfSentence) {
       // If the two or three word phrase is 'good good' or 'good good good', the program doesnt work properly
       if (arrayOfSentence[wordInSentenceIndex].replace(/[^\w\s]|_/g, '') === arrayOfPhrase[0]) {
@@ -58,29 +76,55 @@ function searchForPhrase (inputPhrase, inputSentence) {
       }
     }
   } else if (arrayOfPhrase.length === 2) {
-    for (const wordInSentenceIndex in arrayOfSentence) {
-      if (arrayOfSentence[wordInSentenceIndex] === arrayOfPhrase[0]) {
+    if (arrayOfPhrase[0] === arrayOfPhrase[1]) {
+      for (const wordInSentenceIndex in arrayOfSentence) {
+        if (arrayOfSentence[wordInSentenceIndex] === arrayOfPhrase[0]) {
+          if (typeof (wordA) === 'undefined') {
+            wordA = wordInSentenceIndex
+          } else if (typeof (wordA) !== 'undefined' && typeof (wordB) === 'undefined') {
+            wordB = wordInSentenceIndex
+          } else if (typeof (wordA) !== 'undefined' && typeof (wordB) !== 'undefined') {
+            // Reverse backupA and condition check?
+            if (wordInSentenceIndex - backupA < wordB - wordA) {
+              wordA = backupA
+              wordB = wordInSentenceIndex
+              console.log(backupA)
+              console.log(wordInSentenceIndex)
+            }
 
-        if (typeof (wordA) === 'undefined') {
-          wordA = wordInSentenceIndex
-        } else if (typeof (wordA) !== 'undefined') {
-          if (typeof (wordB) === 'undefined') {
-            backupA = wordInSentenceIndex
-            wordA = backupA
-          } else if (typeof (wordB) !== 'undefined') {
+            if (backupA - wordB < wordB - wordA) {
+              wordA = wordB
+              wordB = backupA
+            }
             backupA = wordInSentenceIndex
           }
         }
+      }
+    } else {
+      for (const wordInSentenceIndex in arrayOfSentence) {
+        if (arrayOfSentence[wordInSentenceIndex] === arrayOfPhrase[0]) {
 
-      } else if (arrayOfSentence[wordInSentenceIndex] === arrayOfPhrase[1]) {
+          if (typeof (wordA) === 'undefined') {
+            wordA = wordInSentenceIndex
+          } else if (typeof (wordA) !== 'undefined') {
+            if (typeof (wordB) === 'undefined') {
+              backupA = wordInSentenceIndex
+              wordA = backupA
+            } else if (typeof (wordB) !== 'undefined') {
+              backupA = wordInSentenceIndex
+            }
+          }
 
-        if (typeof (wordA) !== 'undefined' && typeof (wordB) === 'undefined') {
-          wordB = wordInSentenceIndex
-        }
+        } else if (arrayOfSentence[wordInSentenceIndex] === arrayOfPhrase[1]) {
 
-        if (wordInSentenceIndex - backupA > 0 && wordInSentenceIndex - backupA < wordB - wordA) {
-          wordA = backupA
-          wordB = wordInSentenceIndex
+          if (typeof (wordA) !== 'undefined' && typeof (wordB) === 'undefined') {
+            wordB = wordInSentenceIndex
+          }
+
+          if (wordInSentenceIndex - backupA > 0 && wordInSentenceIndex - backupA < wordB - wordA) {
+            wordA = backupA
+            wordB = wordInSentenceIndex
+          }
         }
       }
     }
@@ -96,7 +140,6 @@ function searchForPhrase (inputPhrase, inputSentence) {
   console.log(toBeHighlighted)
   if (toBeHighlighted.length === arrayOfPhrase.length) {
     for (const index in toBeHighlighted) {
-      console.log(toBeHighlighted[index])
       arrayOfSentence[toBeHighlighted[index]] = '<p>' + arrayOfSentence[toBeHighlighted[index]] + '<p>'
     }
   }
